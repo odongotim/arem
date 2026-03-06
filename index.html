@@ -192,6 +192,11 @@
 </main>
 
 <script>
+    if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js')
+    .then(() => console.log("Arem Medicare Offline Mode: Active"))
+    .catch((err) => console.log("Offline mode failed:", err));
+}
     let db;
     const request = indexedDB.open("DrugShopDB", 6);
 
