@@ -393,6 +393,13 @@ function updatePassword() {
     document.getElementById('newPass1').value = "";
     document.getElementById('newPass2').value = "";
 }
+
+function logout() {
+    sessionStorage.removeItem('isLoggedIn');
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('adminPass').value = '';
+    document.getElementById('login-error').style.display = 'none';
+}
 </script>
 </body>
 </html>
