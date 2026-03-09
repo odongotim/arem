@@ -3,413 +3,274 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arem Medicare - Shop Manager</title>
+    <title>Arem Medicare Ledger</title>
     <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="logo.png">
-<meta name="theme-color" content="#2c3e50">
     <style>
-        :root { --primary: #2c3e50; --success: #27ae60; --danger: #e74c3c; --bg: #f4f7f6; --white: #ffffff; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; display: flex; color: #333; }
-
-        /* Navigation Sidebar */
-        nav { 
-            width: 240px; background: var(--primary); color: white; height: 100vh; 
-            padding: 20px; position: fixed; transition: 0.3s; z-index: 999; left: 0;
-        }
-        nav h2 { font-size: 1.2rem; margin-bottom: 5px; }
-        nav .nav-item { padding: 15px 10px; cursor: pointer; border-bottom: 1px solid #34495e; transition: 0.2s; }
-        nav .nav-item:hover { background: #34495e; }
+        :root { --primary: #2c3e50; --success: #27ae60; --danger: #e74c3c; --bg: #f4f7f6; --accent: #34495e; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
         
-        /* Main Content Area */
-        main { margin-left: 280px; padding: 40px; width: 100%; transition: 0.3s; }
-        .section { display: none; background: var(--white); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        /* Branding Header */
+        .brand-header { background: white; padding: 15px; text-align: center; border-bottom: 2px solid var(--primary); }
+        .brand-header img { width: 60px; height: auto; margin-bottom: 5px; }
+        .brand-header h1 { margin: 0; color: var(--primary); font-size: 1.4rem; letter-spacing: 1px; }
+        .brand-header p { margin: 2px 0 0 0; color: #7f8c8d; font-size: 0.75rem; font-style: italic; font-weight: bold; }
+
+        /* Tab Navigation */
+        .tab-bar { display: none; background: var(--primary); position: sticky; top: 0; z-index: 1000; justify-content: space-around; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .tab-item { color: #bdc3c7; padding: 12px 5px; font-size: 0.8rem; font-weight: bold; cursor: pointer; flex: 1; text-align: center; border-bottom: 3px solid transparent; }
+        .tab-item.active { color: white; border-bottom: 3px solid var(--success); background: rgba(255,255,255,0.1); }
+        
+        /* Layout */
+        .section { display: none; padding: 20px; max-width: 800px; margin: 0 auto; width: 100%; box-sizing: border-box; }
         .section.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Form Elements */
-        input, select, button { 
-            width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; 
-            border-radius: 8px; box-sizing: border-box; font-size: 1rem;
-        }
-        button { background: var(--success); color: white; border: none; font-weight: bold; cursor: pointer; }
-        button:hover { opacity: 0.9; }
-        img {
-            height: 150px;
-            width: auto;
-            border-radius: 20px;
-        }
+        /* Login Screen */
+        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); z-index: 2000; display: flex; justify-content: center; align-items: center; color: white; }
+        .login-box { background: white; padding: 30px; border-radius: 15px; width: 280px; text-align: center; color: #333; }
 
-        /* Tables */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #eee; }
-        th { background: #f8f9fa; color: #666; font-size: 0.9rem; }
-
-        /* Dashboard Cards */
-        .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .card { padding: 20px; border-radius: 10px; border-left: 5px solid; }
-        .card p { margin: 0; font-size: 0.9rem; color: #666; }
-        .card h3 { margin: 10px 0 0 0; font-size: 1.5rem; }
-    
-        /* Mobile Adjustments */
-        @media screen and (max-width: 768px) {
-            #mobile-menu-btn { display: block !important; }
-            nav { left: -280px; width: 240px; }
-            nav.open { left: 0; }
-            main { margin-left: 0; padding: 70px 15px 20px 15px; }
-            .dash-grid { grid-template-columns: 1fr; }
-        }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Elements */
+        .stat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-left: 5px solid var(--danger); margin-bottom: 20px; }
+        .stat-card h3 { margin: 0; color: #666; font-size: 0.8rem; text-transform: uppercase; }
+        .stat-card p { margin: 10px 0 0 0; font-size: 1.8rem; font-weight: bold; color: var(--primary); }
+        .card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        
+        input, button { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
+        button { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; }
+        .btn-pay { background: var(--success); width: auto; padding: 5px 12px; font-size: 0.8rem; }
+        
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th, td { text-align: left; padding: 10px; border-bottom: 1px solid #eee; }
+        .tag { padding: 3px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; }
+        .tag-partial { background: #fff9c4; color: #fbc02d; border: 1px solid #fbc02d; }
+        h3 {text-align: center;}
+        .tag-unpaid { background: #ffebee; color: var(--danger); border: 1px solid var(--danger); }
     </style>
 </head>
 <body>
-    <div id="login-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); z-index: 2000; display: flex; justify-content: center; align-items: center; flex-direction: column; color: white;">
-    <div style="background: white; padding: 40px; border-radius: 15px; width: 300px; text-align: center; color: #333; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
-        <img src="logo.png" alt="">
-        <h2 style="margin-top: 0;">Arem Medicare</h2>
-        <p style="color: #666; font-size: 0.9rem;">Staff Authorization Required</p>
-        <input type="password" id="adminPass" placeholder="Enter Access Code" style="margin-top: 20px; text-align: center;">
-        <button onclick="checkLogin()" style="background: var(--primary); width: 100%;">Login to System</button>
-        <p id="login-error" style="color: var(--danger); font-size: 0.8rem; margin-top: 10px; display: none;">Incorrect Access Code!</p>
+
+<div id="login-screen">
+    <div class="login-box">
+        <img src="logo.png" style="width: 80px;" alt="Arem Logo">
+        <h2 style="margin: 10px 0 5px 0;">Arem Medicare</h2>
+        <p style="color: #666; font-size: 0.7rem; margin-bottom: 20px;">Your Health is Our Priority</p>
+        <input type="password" id="passCode" placeholder="Access Code">
+        <button onclick="login()">Enter System</button>
     </div>
-    <p style="margin-top: 20px; font-size: 0.8rem; opacity: 0.7;">Akura, Alebtong District Branch</p>
 </div>
 
-<div id="mobile-menu-btn" onclick="toggleNav()" style="display:none; position: fixed; top: 15px; left: 15px; z-index: 1000; font-size: 24px; cursor: pointer; background: var(--primary); color: white; padding: 5px 12px; border-radius: 5px;">
-    ☰
+<div id="brand-info" class="brand-header" style="display: none;">
+    <img src="logo.png" alt="Arem Logo">
+    <h1>AREM MEDICARE</h1>
+    <p>Your Health is Our Priority</p>
 </div>
 
-<nav id="sidebar">
-    <div style="text-align: center; margin-bottom: 20px;">
-        <div style="text-align: center; margin-bottom: 20px; padding: 10px;">
-    <img src="logo.png" alt="Arem Medicare Logo" style="width: 120px; height: auto; margin-bottom: 10px; border-radius: 8px;">
-    <h2 style="margin: 0; font-size: 1.1rem; letter-spacing: 1px;">AREM MEDICARE</h2>
-    <p style="font-size: 0.7rem; color: #bdc3c7; margin: 5px 0;">Your Health is Our Priority</p>
+<div class="tab-bar" id="main-nav">
+    <div class="tab-item active" onclick="switchTab('new-entry', this)">📝 New Debt</div>
+    <div class="tab-item" onclick="switchTab('active-debtors', this)">📒 Ledger</div>
+    <div class="tab-item" onclick="switchTab('security', this)">⚙️ Admin</div>
+    <div class="tab-item" onclick="logout()" style="color: var(--danger);">🔓 Exit</div>
 </div>
-        <p style="font-size: 0.75rem; color: #bdc3c7; margin: 0;">Your Health is Our Priority</p>
-    </div>
-    <hr style="border: 0; border-top: 1px solid #34495e; margin: 15px 0;">
-    <div class="nav-item" onclick="showSection('dashboard')">📊 Dashboard</div>
-    <div class="nav-item" onclick="showSection('sales')">🛒 New Sale</div>
-    <div class="nav-item" onclick="showSection('inventory')">📦 Stock Manager</div>
-    <div class="nav-item" onclick="showSection('debts')">📒 Debt Ledger</div>
-    <div class="nav-item" onclick="showSection('settings')">⚙️ Settings</div>
-    <div class="nav-item" onclick="logout()" style="color: #e74c3c; border-top: 2px solid #34495e; margin-top: 20px;">🔓 Logout</div>
-    
-    <div style="position: absolute; bottom: 20px; font-size: 0.7rem; color: #bdc3c7; line-height: 1.4; padding: 0 10px;">
-        📍 Akura, Alebtong District<br>
-        📞 0773304101
-    </div>
-</nav>
 
-<main>
-    <div id="dashboard" class="section active">
-        <h2>Arem Medicare - Akura Branch</h2>
-        <div class="dash-grid">
-            <div class="card" style="border-left-color: #3498db; background: #ebf5fb;">
-                <p>Cash Collected</p><h3 id="dashCash">Ugx 0</h3>
-            </div>
-            <div class="card" style="border-left-color: #f1c40f; background: #fef9e7;">
-                <p>Total Debt</p><h3 id="dashDebt">Ugx 0</h3>
-            </div>
-            <div class="card" style="border-left-color: #27ae60; background: #eafaf1;">
-                <p>Inventory Value</p><h3 id="dashValue">Ugx 0</h3>
-            </div>
-            <div class="card" style="border-left-color: #e74c3c; background: #fdedec;">
-                <p>Low Stock</p><h3 id="dashLowStock">0</h3>
-            </div>
+<main id="app-content" style="display: none;">
+    <div id="new-entry" class="section active">
+        <div class="stat-card">
+            <h3>Outstanding Collections</h3>
+            <p id="totalUncollected" style="text-align: center;">Ugx 0</p>
         </div>
-        <h3>Last 5 Transactions</h3>
-        <table id="recentTable">
-            <thead><tr><th>Date</th><th>Customer</th><th>Amount</th></tr></thead>
-            <tbody></tbody>
-        </table>
-    </div>
 
-    <div id="sales" class="section">
-        <h2>Record New Sale</h2>
-        <input type="text" id="saleDrug" placeholder="Search Drug Name" onchange="updateTotalPrice()">
-        <input type="number" id="saleQty" placeholder="Quantity" oninput="updateTotalPrice()">    
-        <input type="number" id="salePrice" placeholder="Total Price (Ugx)" readonly style="background: #f1f1f1; font-weight: bold; color: #2c3e50;">
-        <input type="text" id="saleCust" placeholder="Customer Name">
-        
-        <select id="saleStatus" onchange="toggleDebtFields()">
-            <option value="Paid">Cash Sale (Paid)</option>
-            <option value="Debt">Debt (Unpaid/Partial)</option>
-        </select>
+        <div class="card">
+            <h3>Record New Debt</h3>
+            <input type="text" id="custName" placeholder="Patient Full Name">
+            <input type="tel" id="custPhone" placeholder="Phone Number">
+            <input type="text" id="custAddress" placeholder="Village / Physical Address">
+            <input type="date" id="debtDate">
 
-        <div id="debtInfoFields" style="display: none; border-left: 4px solid var(--danger); padding-left: 15px; margin-bottom: 20px; background: #fff5f5; padding-top: 10px;">
-            <p style="color: var(--danger); font-size: 0.85rem; font-weight: bold; margin-bottom: 10px;">Customer Contact Details Required:</p>
-            <input type="tel" id="salePhone" placeholder="Phone Number">
-            <input type="text" id="saleAddress" placeholder="Physical Address">
+            <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e9ecef;">
+                <p style="margin:0 0 8px 0; font-size: 0.8rem; font-weight: bold; color: var(--primary);">List Medicines:</p>
+                <div style="display: flex; gap: 5px;">
+                    <input type="text" id="tempMed" placeholder="Enter drug name" style="margin-bottom:0; flex: 2;">
+                    <button onclick="addMedToList()" style="width: auto; margin-bottom:0; flex: 1;">+ Add</button>
+                </div>
+                <ul id="medListDisplay" style="font-size: 0.85rem; padding-left: 18px; margin-top: 10px; color: var(--primary);"></ul>
+            </div>
+
+            <input type="number" id="debtAmount" placeholder="Total Amount (Ugx)">
+            <button onclick="saveDebt()" style="background: var(--danger);">Record Debt</button>
         </div>
-        <button onclick="processSale()">Complete Transaction</button>
     </div>
 
-    <div id="inventory" class="section">
-        <h2>Stock Management</h2>
-        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-            <input type="text" id="stockName" placeholder="Drug Name">
-            <input type="number" id="stockQty" placeholder="Stock Quantity">
-            <input type="number" id="stockUnitPrice" placeholder="Selling Price (Ugx)" step="1">
-            <button onclick="addStock()" style="background: var(--primary);">Add/Update Stock</button>
+    <div id="active-debtors" class="section">
+        <h3>Debtor List</h3>
+        <div class="card" style="padding: 10px; overflow-x: auto;">
+            <table id="debtTable">
+                <thead>
+                    <tr>
+                        <th>Patient</th>
+                        <th>Balance</th>
+                        <th>Medicine</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
-        <table id="stockTable">
-            <thead><tr><th>Drug Name</th><th>In Stock</th><th>Unit Price</th></tr></thead>
-            <tbody></tbody>
-        </table>
     </div>
 
-    <div id="debts" class="section">
-        <h2>Debt Ledger</h2>
-        <table id="debtTable">
-            <thead><tr><th>Customer</th><th>Balance</th><th>Contact Info</th><th>Drug</th><th>Action</th></tr></thead>
-            <tbody></tbody>
-        </table>
+    <div id="security" class="section">
+        <div class="card">
+            <h3>System Security</h3>
+            <label style="font-size: 0.75rem; color: #666;">Current Access Code</label>
+            <input type="password" id="oldPass" placeholder="****">
+            <hr style="border: 0; border-top: 1px dashed #ddd; margin: 15px 0;">
+            <label style="font-size: 0.75rem; color: #666;">New Access Code</label>
+            <input type="password" id="newPass1" placeholder="New 4-digit code">
+            <input type="password" id="newPass2" placeholder="Confirm new code">
+            <button onclick="updatePassword()">Update Code</button>
+        </div>
+        <p style="text-align: center; color: #999; font-size: 0.7rem; margin-top: 50px;">Branch: Akura, Alebtong District</p>
     </div>
-
-    <div id="settings" class="section">
-    <h2>System Settings</h2>
-    
-    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #dee2e6;">
-        <h3>Change Access Code</h3>
-        <p style="font-size: 0.8rem; color: #666;">Verify your current identity to set a new code.</p>
-        
-        <input type="password" id="oldPass" placeholder="Enter Current Access Code">
-        <hr style="border: 0; border-top: 1px dashed #ccc; margin: 15px 0;">
-        <input type="password" id="newPass1" placeholder="Enter New Access Code">
-        <input type="password" id="newPass2" placeholder="Confirm New Access Code">
-        
-        <button onclick="updatePassword()" style="background: var(--primary);">Update Password</button>
-    </div>
-
-    <div style="background: #fff5f5; padding: 20px; border-radius: 10px; border: 1px solid #feb2b2;">
-        <h3 style="color: var(--danger);">Danger Zone</h3>
-        <p style="font-size: 0.8rem; color: #666;">Delete all local data. This cannot be undone.</p>
-        <button onclick="clearAllData()" style="background: var(--danger);">Wipe All Data</button>
-    </div>
-</div>
-</div>
 </main>
 
 <script>
-    if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js')
-    .then(() => console.log("Arem Medicare Offline Mode: Active"))
-    .catch((err) => console.log("Offline mode failed:", err));
-}
-    if (navigator.storage && navigator.storage.persist) {
-  navigator.storage.persist().then(granted => {
-    if (granted) console.log("Arem Medicare: Storage will not be deleted by the OS.");
-  });
-}
     let db;
-    const request = indexedDB.open("DrugShopDB", 6);
+    let tempMedicines = [];
+    let currentPassword = localStorage.getItem('aremDebtPass') || "1234";
 
+    const request = indexedDB.open("AremDebtDB", 2);
     request.onupgradeneeded = e => {
         db = e.target.result;
-        if (!db.objectStoreNames.contains("stock")) db.createObjectStore("stock", { keyPath: "name" });
-        if (!db.objectStoreNames.contains("sales")) db.createObjectStore("sales", { keyPath: "id", autoIncrement: true });
+        if (!db.objectStoreNames.contains("debts")) {
+            db.createObjectStore("debts", { keyPath: "id", autoIncrement: true });
+        }
     };
-
     request.onsuccess = e => { 
         db = e.target.result; 
-        renderAll(); 
+        if(sessionStorage.getItem('isLoggedIn') === 'true') showApp();
     };
 
-    function toggleNav() { document.getElementById('sidebar').classList.toggle('open'); }
+    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js'); }
 
-    function showSection(id) {
+    function switchTab(tabId, el) {
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
-        renderAll();
+        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        el.classList.add('active');
+        if(tabId === 'active-debtors') renderDebts();
     }
 
-    function toggleDebtFields() {
-        const status = document.getElementById('saleStatus').value;
-        document.getElementById('debtInfoFields').style.display = (status === "Debt") ? "block" : "none";
+    function showApp() {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('brand-info').style.display = 'block';
+        document.getElementById('main-nav').style.display = 'flex';
+        document.getElementById('app-content').style.display = 'block';
+        renderDebts();
     }
 
-    function updateTotalPrice() {
-        const drugName = document.getElementById('saleDrug').value;
-        const qty = parseInt(document.getElementById('saleQty').value);
-        if (!drugName || isNaN(qty)) return;
-
-        const tx = db.transaction("stock", "readonly");
-        tx.objectStore("stock").get(drugName).onsuccess = e => {
-            const item = e.target.result;
-            if (item && item.unitPrice) {
-                document.getElementById('salePrice').value = (item.unitPrice * qty);
-            }
-        };
+    function login() {
+        if (document.getElementById('passCode').value === currentPassword) {
+            sessionStorage.setItem('isLoggedIn', 'true');
+            showApp();
+        } else {
+            alert("Unauthorized Access!");
+        }
     }
 
-    function addStock() {
-        const name = document.getElementById('stockName').value;
-        const qty = parseInt(document.getElementById('stockQty').value);
-        const unitPrice = parseFloat(document.getElementById('stockUnitPrice').value);
+    function logout() {
+        if(confirm("Sign out of Arem Medicare?")) {
+            sessionStorage.removeItem('isLoggedIn');
+            location.reload();
+        }
+    }
 
-        if(!name || isNaN(qty) || isNaN(unitPrice)) return alert("Please fill all stock details!");
+    function updatePassword() {
+        const op = document.getElementById('oldPass').value;
+        const n1 = document.getElementById('newPass1').value;
+        const n2 = document.getElementById('newPass2').value;
+        if (op === currentPassword && n1 === n2 && n1.length >= 4) {
+            localStorage.setItem('aremDebtPass', n1);
+            currentPassword = n1;
+            alert("Security Code Changed!");
+            ['oldPass', 'newPass1', 'newPass2'].forEach(id => document.getElementById(id).value = "");
+        } else {
+            alert("Verification failed. Check your inputs.");
+        }
+    }
 
-        const tx = db.transaction("stock", "readwrite");
-        tx.objectStore("stock").put({ name, qty, unitPrice });
+    function addMedToList() {
+        const input = document.getElementById('tempMed');
+        if(input.value.trim()) {
+            tempMedicines.push(input.value.trim());
+            document.getElementById('medListDisplay').innerHTML = tempMedicines.map((m, i) => 
+                `<li>${m} <span onclick="removeMed(${i})" style="color:var(--danger); cursor:pointer; margin-left:10px;">[x]</span></li>`
+            ).join('');
+            input.value = ""; input.focus();
+        }
+    }
+
+    function removeMed(index) {
+        tempMedicines.splice(index, 1);
+        document.getElementById('medListDisplay').innerHTML = tempMedicines.map((m, i) => `<li>${m}</li>`).join('');
+    }
+
+    function saveDebt() {
+        const name = document.getElementById('custName').value;
+        const amount = parseFloat(document.getElementById('debtAmount').value);
+        if(!name || isNaN(amount) || tempMedicines.length === 0) return alert("Please add medicines and patient details!");
+
+        const tx = db.transaction("debts", "readwrite");
+        tx.objectStore("debts").add({
+            name, address: document.getElementById('custAddress').value,
+            phone: document.getElementById('custPhone').value,
+            med: tempMedicines.join(", "),
+            amount, paid: 0, date: document.getElementById('debtDate').value,
+            status: 'Unpaid'
+        });
         tx.oncomplete = () => {
-            alert("Inventory Updated Successfully");
-            document.getElementById('stockName').value = "";
-            document.getElementById('stockQty').value = "";
-            document.getElementById('stockUnitPrice').value = "";
-            renderAll();
+            alert("Debt Recorded Successfully");
+            tempMedicines = [];
+            document.getElementById('medListDisplay').innerHTML = "";
+            ['custName', 'custAddress', 'custPhone', 'debtAmount', 'debtDate'].forEach(id => document.getElementById(id).value = "");
+            renderDebts();
         };
     }
 
-    function processSale() {
-        const drug = document.getElementById('saleDrug').value;
-        const qty = parseInt(document.getElementById('saleQty').value);
-        const price = parseFloat(document.getElementById('salePrice').value);
-        const status = document.getElementById('saleStatus').value;
-        const customer = document.getElementById('saleCust').value;
-        const phone = document.getElementById('salePhone').value || "N/A";
-        const address = document.getElementById('saleAddress').value || "N/A";
-
-        if (status === "Debt" && !document.getElementById('salePhone').value) return alert("Phone number is required for debt tracking!");
-
-        const tx = db.transaction(["stock", "sales"], "readwrite");
-        tx.objectStore("stock").get(drug).onsuccess = e => {
-            const item = e.target.result;
-            if(!item || item.qty < qty) return alert("Insufficient stock in Arem Medicare!");
-
-            item.qty -= qty;
-            tx.objectStore("stock").put(item);
-
-            const sale = { drug, qty, price, customer, status, phone, address, paidAmount: (status === "Paid" ? price : 0), date: new Date().toLocaleDateString() };
-            tx.objectStore("sales").add(sale); 
-
-            tx.oncomplete = () => {
-                syncToCloud({ type: "Sale", drugName: drug, qty, amount: price, customerOrStatus: status + ": " + customer, phone, address });
-                alert("Transaction Recorded");
-                showSection('dashboard');
-            };
-        };
-    }
-
-    function handlePayment(id) {
-        const tx = db.transaction("sales", "readwrite");
-        tx.objectStore("sales").get(id).onsuccess = e => {
-            const sale = e.target.result;
-            const balance = sale.price - (sale.paidAmount || 0);
-            const pay = parseFloat(prompt(`Enter amount paid (Ugx) by ${sale.customer}:`, balance));
-
-            if (isNaN(pay) || pay <= 0) return;
-            sale.paidAmount = (sale.paidAmount || 0) + pay;
-            sale.status = (sale.paidAmount >= sale.price) ? "Paid" : "Partial";
-            tx.objectStore("sales").put(sale);
-            tx.oncomplete = () => {
-                syncToCloud({ type: "Payment", drugName: sale.drug, qty: 0, amount: pay, customerOrStatus: "Credit Pay: " + sale.customer });
-                renderAll();
-            };
-        };
-    }
-
-    function renderAll() {
+    function renderDebts() {
         if(!db) return;
-
-        // Inventory
-        const sBody = document.querySelector("#stockTable tbody");
-        sBody.innerHTML = "";
-        let invVal = 0, lowStock = 0;
-        db.transaction("stock").objectStore("stock").getAll().onsuccess = e => {
-            e.target.result.forEach(i => {
-                invVal += (i.qty * (i.unitPrice || 0));
-                if(i.qty < 10) lowStock++;
-                sBody.innerHTML += `<tr><td>${i.name}</td><td>${i.qty}</td><td>Ugx ${Number(i.unitPrice || 0).toLocaleString()}</td></tr>`;
-            });
-            document.getElementById('dashValue').innerText = "Ugx " + invVal.toLocaleString();
-            document.getElementById('dashLowStock').innerText = lowStock;
-        };
-
-        // Debts & Dashboard
-        const dBody = document.querySelector("#debtTable tbody");
-        const recBody = document.querySelector("#recentTable tbody");
-        dBody.innerHTML = ""; recBody.innerHTML = "";
-        let cashCollected = 0, totalDebt = 0;
-
-        db.transaction("sales").objectStore("sales").getAll().onsuccess = e => {
-            const sales = e.target.result;
-            sales.slice(-5).reverse().forEach(s => {
-                recBody.innerHTML += `<tr><td>${s.date}</td><td>${s.customer || 'Cash'}</td><td>Ugx ${Number(s.price).toLocaleString()}</td></tr>`;
-            });
-            sales.forEach(s => {
-                cashCollected += (s.paidAmount || 0);
-                if(s.status !== "Paid") {
-                    const bal = s.price - (s.paidAmount || 0);
-                    totalDebt += bal;
-                    dBody.innerHTML += `<tr><td>${s.customer}</td><td>Ugx ${bal.toLocaleString()}</td><td><small>${s.phone}<br>${s.address}</small></td><td>${s.drug}</td><td><button onclick="handlePayment(${s.id})" style="padding: 5px; width: auto;">Pay</button></td></tr>`;
+        const tbody = document.querySelector("#debtTable tbody");
+        tbody.innerHTML = "";
+        let total = 0;
+        db.transaction("debts").objectStore("debts").getAll().onsuccess = e => {
+            e.target.result.forEach(d => {
+                const bal = d.amount - d.paid;
+                if(bal > 0) {
+                    total += bal;
+                    tbody.innerHTML += `<tr>
+                        <td><strong>${d.name}</strong><br><small>${d.phone}</small></td>
+                        <td>Ugx ${bal.toLocaleString()}<br><span class="tag ${d.paid > 0 ? 'tag-partial' : 'tag-unpaid'}">${d.status}</span></td>
+                        <td><small>${d.med}</small></td>
+                        <td><button onclick="payDebt(${d.id}, ${bal})" class="btn-pay">Pay</button></td>
+                    </tr>`;
                 }
             });
-            document.getElementById('dashCash').innerText = "Ugx " + cashCollected.toLocaleString();
-            document.getElementById('dashDebt').innerText = "Ugx " + totalDebt.toLocaleString();
+            document.getElementById('totalUncollected').innerText = "Ugx " + total.toLocaleString();
         };
     }
 
-    async function syncToCloud(data) {
-        const URL = "https://script.google.com/macros/s/AKfycbxIvOd3lgwtoZOqmdbylbA7sbf_vcfwO-flqcYsmy9LDIV0g-I6wocWVxHp-U01_frtrw/exec";
-        try { await fetch(URL, { method: "POST", mode: "no-cors", body: JSON.stringify(data) }); } catch(e) {}
+    function payDebt(id, bal) {
+        const p = parseFloat(prompt(`Enter amount paid (Max Ugx ${bal.toLocaleString()}):`, bal));
+        if(!isNaN(p) && p > 0) {
+            const tx = db.transaction("debts", "readwrite");
+            const store = tx.objectStore("debts");
+            store.get(id).onsuccess = e => {
+                const data = e.target.result;
+                data.paid += p;
+                data.status = (data.paid >= data.amount) ? 'Paid' : 'Partial';
+                store.put(data);
+                tx.oncomplete = () => renderDebts();
+            };
+        }
     }
-
-    // Initialize password from storage or use default
-let currentPassword = localStorage.getItem('shopPass') || "1234";
-
-function checkLogin() {
-    const input = document.getElementById('adminPass').value;
-    const errorMsg = document.getElementById('login-error');
-    if (input === currentPassword) {
-        document.getElementById('login-screen').style.display = 'none';
-        sessionStorage.setItem('isLoggedIn', 'true');
-        renderAll();
-    } else {
-        errorMsg.style.display = 'block';
-        document.getElementById('adminPass').value = "";
-    }
-}
-
-function updatePassword() {
-    const oldP = document.getElementById('oldPass').value;
-    const p1 = document.getElementById('newPass1').value;
-    const p2 = document.getElementById('newPass2').value;
-
-    // 1. Verify Current Password
-    if (oldP !== currentPassword) {
-        return alert("Verification Failed: Current access code is incorrect.");
-    }
-
-    // 2. Validate New Password
-    if (!p1 || p1.length < 4) {
-        return alert("Security Requirement: New code must be at least 4 digits.");
-    }
-
-    // 3. Confirm Match
-    if (p1 !== p2) {
-        return alert("Input Error: New codes do not match!");
-    }
-
-    // 4. Save to LocalStorage
-    localStorage.setItem('shopPass', p1);
-    currentPassword = p1; // Update the global variable
-    
-    alert("Success! Arem Medicare Access Code has been updated.");
-    
-    // Clear the fields
-    document.getElementById('oldPass').value = "";
-    document.getElementById('newPass1').value = "";
-    document.getElementById('newPass2').value = "";
-}
-
-function logout() {
-    sessionStorage.removeItem('isLoggedIn');
-    document.getElementById('login-screen').style.display = 'flex';
-    document.getElementById('adminPass').value = '';
-    document.getElementById('login-error').style.display = 'none';
-}
 </script>
 </body>
 </html>
