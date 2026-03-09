@@ -197,6 +197,11 @@
     .then(() => console.log("Arem Medicare Offline Mode: Active"))
     .catch((err) => console.log("Offline mode failed:", err));
 }
+    if (navigator.storage && navigator.storage.persist) {
+  navigator.storage.persist().then(granted => {
+    if (granted) console.log("Arem Medicare: Storage will not be deleted by the OS.");
+  });
+}
     let db;
     const request = indexedDB.open("DrugShopDB", 6);
 
